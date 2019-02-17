@@ -1,0 +1,29 @@
+body {
+    background-color: #cfd0cf;
+    width: 620px;
+    margin: auto;
+}
+
+.game_header {
+    text-align: center;
+    color: #434344;
+    line-height: 47px;
+    font: bold 42px Arial, sans-serif;
+}
+
+.game_field {
+    display: flex;
+    margin: auto;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.card {
+    text-align: center;
+    width: 120px;
+    height: 120px;
+    margin: 12.5px;
+    border:solid 5px white;
+    border-radius: 9px;
+    background: linear-gradient(45deg, #22ab93, #16668d);
+}
