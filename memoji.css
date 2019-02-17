@@ -20,8 +20,22 @@ body {
     text-align: center;
     background: linear-gradient(45deg, #22ab93, #16668d);
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    perspective: 600px;
 }
 
 .card:hover {
     opacity: 0.9;
+    
 }
+
+/*
+@keyframes main-rotate {
+    100% {
+    transform: rotateY(180deg);
+    }
+}
+
+.card:hover {
+    animation: main-rotate 0.5s infinite linear;
+}
+*/

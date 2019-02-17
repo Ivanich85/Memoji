@@ -10,8 +10,9 @@ var borderRadius = 9;
 var borderColor = '#FFFFFF';
 
 window.onload = function() {
-    fillGameField(createGameField(columnsQuantity), rowsQuantity, columnsQuantity);
-
+    var gameField = createGameField(columnsQuantity);
+    fillGameField(gameField, rowsQuantity, columnsQuantity);
+    setListener(Array.from(gameField.querySelectorAll('.card')));
 }
 
 // На вход принимает только столбцы, т.к необходима только ширина поля
@@ -32,7 +33,7 @@ function fillGameField(gameField, row, col) {
 
 function createCard(row, col) {
     var card = document.createElement('div');
-    card.className = 'card ';
+    card.className = 'card';
     card.id = 'card_' + row + col;
     setCardSize(card);
     return card;
@@ -44,4 +45,14 @@ function setCardSize(card) {
     card.style.margin = cardMargin + 'px';
     card.style.border = 'solid ' + cardBorder + 'px ' + borderColor;
     card.style.borderRadius = borderRadius + 'px';
+}
+
+function setListener(cardsArr) {
+    cardsArr.forEach(function(item, cardsArr) {
+        item.onclick = clickCard;
+    });
+}
+
+function clickCard() {
+    alert("!!!!");
 }
