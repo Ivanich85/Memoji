@@ -16,26 +16,33 @@ body {
     flex-wrap: wrap;
 }
 
-.card {
-    text-align: center;
-    background: linear-gradient(45deg, #22ab93, #16668d);
+.game_field > div {
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
     perspective: 600px;
 }
 
-.card:hover {
+.game_field > div:hover {
     opacity: 0.9;
-    
 }
 
-/*
+.card {
+    text-align: center;
+    background: linear-gradient(45deg, #22ab93, #16668d);
+}
+
+.card-reverse {
+    text-align: center;
+    background: white;
+    font-size: 75px;
+}
+
+
 @keyframes main-rotate {
     100% {
     transform: rotateY(180deg);
     }
 }
 
-.card:hover {
+.game_field > div:checked {
     animation: main-rotate 0.5s infinite linear;
 }
-*/

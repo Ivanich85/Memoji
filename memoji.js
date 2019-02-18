@@ -9,7 +9,14 @@ var cardBorder = 5;
 var borderRadius = 9;
 var borderColor = '#FFFFFF';
 
-window.onload = function() {
+var prev = performance.now();
+var times = 0;
+
+function myMove(elem) {
+    elem.style.transform = 'rotateY(180deg)';
+  }
+
+window.onload = function () {
     var gameField = createGameField(columnsQuantity);
     fillGameField(gameField, rowsQuantity, columnsQuantity);
     setListener(Array.from(gameField.querySelectorAll('.card')));
@@ -26,7 +33,7 @@ function createGameField(columns) {
 function fillGameField(gameField, row, col) {
     for (var i = 0; i < row; i++) {
         for (var j = 0; j < col; j++) {
-            gameField.appendChild(createCard(gameField, i, j));
+            gameField.appendChild(createCard(i, j));
         }
     }
 }
@@ -34,7 +41,7 @@ function fillGameField(gameField, row, col) {
 function createCard(row, col) {
     var card = document.createElement('div');
     card.className = 'card';
-    card.id = 'card_' + row + col;
+    card.id = 'card_' + row + '_' + col;
     setCardSize(card);
     return card;
 }
@@ -48,11 +55,23 @@ function setCardSize(card) {
 }
 
 function setListener(cardsArr) {
-    cardsArr.forEach(function(item, cardsArr) {
-        item.onclick = clickCard;
+    cardsArr.forEach(function (item) {
+        item.addEventListener('click', function () {
+            rollCard(item);
+        })
     });
 }
 
-function clickCard() {
-    alert("!!!!");
+function rollCard(card) {
+    card.classList.toggle('card');
+    card.classList.toggle('card-reverse');
+    myMove(card);
+    if (card.classList.contains('card-reverse')) {
+        card.textContent = '🐰';
+    } else {
+        card.textContent = '';
+    }
 }
+
+
+
