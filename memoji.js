@@ -1,31 +1,53 @@
-var rowsQuantity = 3;
-var columnsQuantity = 4;
+// Game field parameters
+var ROWS_QUANTITY = 3;
+var COLUMNS_QUANTITY = 4;
+var CARD_QUANTITY = ROWS_QUANTITY * COLUMNS_QUANTITY;
 
-// Геометрические параметры карточки
-var cardWidth = 120;
-var cardHeight = 120;
-var cardMargin = 12.5;
-var cardBorder = 5;
-var borderRadius = 9;
-var borderColor = '#FFFFFF';
+// Card`s geometry and color parameters
+var CARD_WIDTH = 120;
+var CARD_HEIGHT = 120;
+var CARD_MARGIN = 12.5;
+var CARD_BORDER = 5;
+var BORDER_RADIUS = 9;
+var BORDER_COLOR = '#FFFFFF';
 
-var prev = performance.now();
-var times = 0;
+// All emojies array
+var EMOJI_ARRAY = [
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🐻', '🐟', '🐊', '🐸', '🐙', '🐵',
+    '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐓', '🦃', '🦄', '🐞', '🦀'
+];
 
-function myMove(elem) {
-    elem.style.transform = 'rotateY(180deg)';
-  }
+// The array will be filled by generateEmojiArray() method
+var RESULT_EMOJI_ARRAY = [];
 
 window.onload = function () {
-    var gameField = createGameField(columnsQuantity);
-    fillGameField(gameField, rowsQuantity, columnsQuantity);
-    setListener(Array.from(gameField.querySelectorAll('.card')));
+    generateEmojiArray(EMOJI_ARRAY);
+    console.log(RESULT_EMOJI_ARRAY);
+    let gameField = createGameField(COLUMNS_QUANTITY);
+    fillGameField(gameField, ROWS_QUANTITY, COLUMNS_QUANTITY);
+    setCardListener(Array.from(gameField.querySelectorAll('.card')));
 }
 
-// На вход принимает только столбцы, т.к необходима только ширина поля
-function createGameField(columns) {
-    var fieldWidth = columns * (cardWidth + cardMargin * 2 + cardBorder * 2);
-    var field = document.querySelector('.game_field');
+// The method takes 'CARD_QUANTITY / 2' random emojies from 'MAIN_EMOJI_ARRAY'
+// After that this method multiplies the result by two, because we need two similar emoji into array
+// Then the method generate result array
+function generateEmojiArray(emojiArr) {
+    let emojiArrIndex = Math.floor(Math.random() * emojiArr.length);
+    let emoji = emojiArr[emojiArrIndex];
+    if (RESULT_EMOJI_ARRAY.indexOf(emoji) < 0) {
+        RESULT_EMOJI_ARRAY.push(emoji);
+    }
+    if (RESULT_EMOJI_ARRAY.length < CARD_QUANTITY / 2) {
+        generateEmojiArray(emojiArr);
+    } else {
+        RESULT_EMOJI_ARRAY = RESULT_EMOJI_ARRAY.concat(RESULT_EMOJI_ARRAY);
+        return RESULT_EMOJI_ARRAY;
+    } 
+}
+
+function createGameField(columns) {    
+    let fieldWidth = columns * (CARD_WIDTH + CARD_MARGIN * 2 + CARD_BORDER * 2);
+    let field = document.querySelector('.game_field');
     field.style.width = fieldWidth + 'px';
     return field;
 }
@@ -39,39 +61,55 @@ function fillGameField(gameField, row, col) {
 }
 
 function createCard(row, col) {
-    var card = document.createElement('div');
+    let card = document.createElement('div');
     card.className = 'card';
     card.id = 'card_' + row + '_' + col;
     setCardSize(card);
+    setEmoji(card, RESULT_EMOJI_ARRAY);
     return card;
 }
 
 function setCardSize(card) {
-    card.style.width = cardWidth + 'px';
-    card.style.height = cardHeight + 'px';
-    card.style.margin = cardMargin + 'px';
-    card.style.border = 'solid ' + cardBorder + 'px ' + borderColor;
-    card.style.borderRadius = borderRadius + 'px';
+    card.style.width = CARD_WIDTH + 'px';
+    card.style.height = CARD_HEIGHT + 'px';
+    card.style.margin = CARD_MARGIN + 'px';
+    card.style.border = 'solid ' + CARD_BORDER + 'px ' + BORDER_COLOR;
+    card.style.borderRadius = BORDER_RADIUS + 'px';
 }
 
-function setListener(cardsArr) {
+function setCardListener(cardsArr) {
     cardsArr.forEach(function (item) {
         item.addEventListener('click', function () {
-            rollCard(item);
+            animateCard(item);
         })
     });
 }
 
-function rollCard(card) {
-    card.classList.toggle('card');
-    card.classList.toggle('card-reverse');
-    myMove(card);
-    if (card.classList.contains('card-reverse')) {
-        card.textContent = '🐰';
+function setEmoji(card, arr) {
+    let arrIndex = Math.floor(Math.random() * arr.length);
+    if (arr[arrIndex]) {
+        card.emoji = arr[arrIndex];
+        delete arr[arrIndex];
+    } else if (arr) {
+        setEmoji(card, arr);
     } else {
-        card.textContent = '';
+        return;
     }
 }
 
+function animateCard(card) {
+    //rotateCard(elem) 90 град. до смены фона и 90 град после смены
+    card.classList.toggle('card');
+    card.classList.toggle('card-reverse');
+    if (card.classList.contains('card-reverse')) {
+        card.textContent = card.emoji;
+    } else {
+        card.textContent = '';
+    }
+    //rotateCard(elem)
+}
 
-
+// Для анимации. Должна прицепляться в animateCard
+function rotateCard(elem) {
+    elem.style.transform = 'rotateY(180deg)';
+}
