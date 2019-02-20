@@ -1,9 +1,9 @@
-// Game field parameters
+//  Game field parameters
 var ROWS_QUANTITY = 3;
 var COLUMNS_QUANTITY = 4;
 var CARD_QUANTITY = ROWS_QUANTITY * COLUMNS_QUANTITY;
 
-// Card`s geometry and color parameters
+//  The card geometry parameters and color
 var CARD_WIDTH = 120;
 var CARD_HEIGHT = 120;
 var CARD_MARGIN = 12.5;
@@ -11,13 +11,19 @@ var CARD_BORDER = 5;
 var BORDER_RADIUS = 9;
 var BORDER_COLOR = '#FFFFFF';
 
-// All emojies array
+//  Animation preferences
+var ANIMATION_DURATION = 300;
+var ANIMATION_START_POSITION = '0';
+var ANIMATION_MIDDLE_POSITION = '180deg';
+var ANIMATION_FINISH_POSITION = '360deg';
+
+//  All emojies array
 var EMOJI_ARRAY = [
     '🐶', '🐱', '🐭', '🐹', '🐰', '🐻', '🐟', '🐊', '🐸', '🐙', '🐵',
     '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐓', '🦃', '🦄', '🐞', '🦀'
 ];
 
-// The array will be filled by generateEmojiArray() method
+//  The array will be filled by 'generateEmojiArray()' method
 var RESULT_EMOJI_ARRAY = [];
 
 window.onload = function () {
@@ -25,12 +31,14 @@ window.onload = function () {
     console.log(RESULT_EMOJI_ARRAY);
     let gameField = createGameField(COLUMNS_QUANTITY);
     fillGameField(gameField, ROWS_QUANTITY, COLUMNS_QUANTITY);
-    setCardListener(Array.from(gameField.querySelectorAll('.card')));
+    setAnimation(Array.from(gameField.querySelectorAll('.card_closed')));
 }
 
-// The method takes 'CARD_QUANTITY / 2' random emojies from 'MAIN_EMOJI_ARRAY'
-// After that this method multiplies the result by two, because we need two similar emoji into array
-// Then the method generate result array
+/*  
+    This method takes 'CARD_QUANTITY / 2' random emojies from 'MAIN_EMOJI_ARRAY' 
+    and puts them to the result array 'RESULT_EMOJI_ARRAY'
+    After that the method multiplies the result by two, because we need two similar emoji into the array
+*/
 function generateEmojiArray(emojiArr) {
     let emojiArrIndex = Math.floor(Math.random() * emojiArr.length);
     let emoji = emojiArr[emojiArrIndex];
@@ -41,11 +49,10 @@ function generateEmojiArray(emojiArr) {
         generateEmojiArray(emojiArr);
     } else {
         RESULT_EMOJI_ARRAY = RESULT_EMOJI_ARRAY.concat(RESULT_EMOJI_ARRAY);
-        return RESULT_EMOJI_ARRAY;
-    } 
+    }
 }
 
-function createGameField(columns) {    
+function createGameField(columns) {
     let fieldWidth = columns * (CARD_WIDTH + CARD_MARGIN * 2 + CARD_BORDER * 2);
     let field = document.querySelector('.game_field');
     field.style.width = fieldWidth + 'px';
@@ -62,7 +69,7 @@ function fillGameField(gameField, row, col) {
 
 function createCard(row, col) {
     let card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card_closed';
     card.id = 'card_' + row + '_' + col;
     setCardSize(card);
     setEmoji(card, RESULT_EMOJI_ARRAY);
@@ -77,10 +84,10 @@ function setCardSize(card) {
     card.style.borderRadius = BORDER_RADIUS + 'px';
 }
 
-function setCardListener(cardsArr) {
+function setAnimation(cardsArr) {
     cardsArr.forEach(function (item) {
         item.addEventListener('click', function () {
-            animateCard(item);
+            turnCard(item);
         })
     });
 }
@@ -97,19 +104,37 @@ function setEmoji(card, arr) {
     }
 }
 
-function animateCard(card) {
-    //rotateCard(elem) 90 град. до смены фона и 90 град после смены
-    card.classList.toggle('card');
-    card.classList.toggle('card-reverse');
-    if (card.classList.contains('card-reverse')) {
-        card.textContent = card.emoji;
-    } else {
-        card.textContent = '';
-    }
-    //rotateCard(elem)
+function turnCard(card) {
+    animateCard(card);
+    setTimeout(function () {
+        card.classList.toggle('card_closed');
+        card.classList.toggle('card_opened');
+        if (card.classList.contains('card_opened')) {
+            card.textContent = card.emoji;
+        } else {
+            card.textContent = '';
+        }
+    }, ANIMATION_DURATION / 2);
 }
 
-// Для анимации. Должна прицепляться в animateCard
-function rotateCard(elem) {
-    elem.style.transform = 'rotateY(180deg)';
+function animateCard(card) {
+    if (card.classList.contains('card_opened')) {
+        animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION);
+    } else {
+        animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION);
+    }
+}
+
+function animateCardSide(card, startPos, finishPos) {
+    var animation = card.animate([
+        {
+            transform: 'rotateY(' + startPos + ')'
+        },
+        {
+            transform: 'rotateY(' + finishPos + ')'
+        }
+    ], ANIMATION_DURATION);
+    animation.addEventListener('finish', function () {
+        card.style.transform = 'rotateY(' + finishPos + ')';
+    });
 }

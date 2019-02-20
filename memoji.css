@@ -25,26 +25,13 @@ body {
     opacity: 0.9;
 }
 
-.card {
+.card_closed {
     text-align: center;
     background: linear-gradient(45deg, #22ab93, #16668d);
 }
 
-.card-reverse {
+.card_opened {
     text-align: center;
     background: white;
     font-size: 75px;
 }
-
-
-/*
-@keyframes main-rotate {
-    100% {
-    transform: rotateY(180deg);
-    }
-}
-
-.game_field > div:checked {
-    animation: main-rotate 0.5s infinite linear;
-}
-*/
