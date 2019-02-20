@@ -1,7 +1,7 @@
 //  Game field parameters
-var ROWS_QUANTITY = 3;
-var COLUMNS_QUANTITY = 4;
-var CARD_QUANTITY = ROWS_QUANTITY * COLUMNS_QUANTITY;
+var NUMBER_OF_LINES = 3;
+var NUMBER_OF_COLUMNS = 4;
+var NUMBER_OF_CARDS = NUMBER_OF_LINES * NUMBER_OF_COLUMNS;
 
 //  The card geometry parameters and color
 var CARD_WIDTH = 120;
@@ -26,12 +26,10 @@ var EMOJI_ARRAY = [
 //  The array will be filled by 'generateEmojiArray()' method
 var RESULT_EMOJI_ARRAY = [];
 
+//  Building game field
 window.onload = function () {
     generateEmojiArray(EMOJI_ARRAY);
-    console.log(RESULT_EMOJI_ARRAY);
-    let gameField = createGameField(COLUMNS_QUANTITY);
-    fillGameField(gameField, ROWS_QUANTITY, COLUMNS_QUANTITY);
-    setAnimation(Array.from(gameField.querySelectorAll('.card_closed')));
+    buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);    
 }
 
 /*  
@@ -45,26 +43,27 @@ function generateEmojiArray(emojiArr) {
     if (RESULT_EMOJI_ARRAY.indexOf(emoji) < 0) {
         RESULT_EMOJI_ARRAY.push(emoji);
     }
-    if (RESULT_EMOJI_ARRAY.length < CARD_QUANTITY / 2) {
+    if (RESULT_EMOJI_ARRAY.length < NUMBER_OF_CARDS / 2) {
         generateEmojiArray(emojiArr);
     } else {
         RESULT_EMOJI_ARRAY = RESULT_EMOJI_ARRAY.concat(RESULT_EMOJI_ARRAY);
     }
 }
 
-function createGameField(columns) {
+function setGameFieldWidth(columns) {
     let fieldWidth = columns * (CARD_WIDTH + CARD_MARGIN * 2 + CARD_BORDER * 2);
     let field = document.querySelector('.game_field');
     field.style.width = fieldWidth + 'px';
     return field;
 }
 
-function fillGameField(gameField, row, col) {
+function buildGameField(gameField, row, col) {
     for (var i = 0; i < row; i++) {
         for (var j = 0; j < col; j++) {
             gameField.appendChild(createCard(i, j));
         }
     }
+    setAnimation(Array.from(gameField.querySelectorAll('.card_closed')));
 }
 
 function createCard(row, col) {
@@ -84,14 +83,6 @@ function setCardSize(card) {
     card.style.borderRadius = BORDER_RADIUS + 'px';
 }
 
-function setAnimation(cardsArr) {
-    cardsArr.forEach(function (item) {
-        item.addEventListener('click', function () {
-            turnCard(item);
-        })
-    });
-}
-
 function setEmoji(card, arr) {
     let arrIndex = Math.floor(Math.random() * arr.length);
     if (arr[arrIndex]) {
@@ -102,6 +93,14 @@ function setEmoji(card, arr) {
     } else {
         return;
     }
+}
+
+function setAnimation(cardsArr) {
+    cardsArr.forEach(function (item) {
+        item.addEventListener('click', function () {
+            turnCard(item);
+        })
+    });
 }
 
 function turnCard(card) {
