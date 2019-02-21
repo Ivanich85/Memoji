@@ -26,7 +26,7 @@ var EMOJI_ARRAY = [
 //  The array will be filled by 'generateEmojiArray()' method
 var RESULT_EMOJI_ARRAY = [];
 
-//  Building game field
+//  Prepare emojies and game field
 window.onload = function () {
     generateEmojiArray(EMOJI_ARRAY);
     buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);    
@@ -118,13 +118,13 @@ function turnCard(card) {
 
 function animateCard(card) {
     if (card.classList.contains('card_opened')) {
-        animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION);
+        animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION)
     } else {
-        animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION);
+        animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION, ANIMATION_FINISH_POSITION)
     }
 }
 
-function animateCardSide(card, startPos, finishPos) {
+function animateCardSide(card, startPos, finishPos, finishTransformPos) {
     var animation = card.animate([
         {
             transform: 'rotateY(' + startPos + ')'
@@ -134,6 +134,6 @@ function animateCardSide(card, startPos, finishPos) {
         }
     ], ANIMATION_DURATION);
     animation.addEventListener('finish', function () {
-        card.style.transform = 'rotateY(' + finishPos + ')';
+        card.style.transform = 'rotateY(' + finishTransformPos + ')';
     });
 }
