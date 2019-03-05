@@ -3,7 +3,7 @@ var NUMBER_OF_LINES = 3;
 var NUMBER_OF_COLUMNS = 4;
 var NUMBER_OF_CARDS = NUMBER_OF_LINES * NUMBER_OF_COLUMNS;
 
-//  The card geometry parameters and color
+//  The card geometry parameters and border color
 var CARD_WIDTH = 120;
 var CARD_HEIGHT = 120;
 var CARD_MARGIN = 12.5;
@@ -26,10 +26,13 @@ var EMOJI_ARRAY = [
 //  The array will be filled by 'generateEmojiArray()' method
 var RESULT_EMOJI_ARRAY = [];
 
+// The array used for open cards comparison
+var OPEN_CARDS_ARRAY = [];
+
 //  Prepare emojies and game field
 window.onload = function () {
     generateEmojiArray(EMOJI_ARRAY);
-    buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);    
+    buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);
 }
 
 /*  
@@ -46,7 +49,7 @@ function generateEmojiArray(emojiArr) {
     if (RESULT_EMOJI_ARRAY.length < NUMBER_OF_CARDS / 2) {
         generateEmojiArray(emojiArr);
     } else {
-        RESULT_EMOJI_ARRAY = RESULT_EMOJI_ARRAY.concat(RESULT_EMOJI_ARRAY);
+        RESULT_EMOJI_ARRAY = RESULT_EMOJI_ARRAY.concat(RESULT_EMOJI_ARRAY).sort();
     }
 }
 
@@ -63,15 +66,26 @@ function buildGameField(gameField, row, col) {
             gameField.appendChild(createCard(i, j));
         }
     }
-    setAnimation(Array.from(gameField.querySelectorAll('.card_closed')));
+    setFieldListener(gameField);
+}
+
+function setFieldListener(field) {
+    field.addEventListener('click', function (event) {
+        var target = event.target;
+        if (target.classList.contains('card_closed') || target.classList.contains('card_opened')) {
+            turnCard(target);
+            compareOpenCards(target);
+        }
+    });
 }
 
 function createCard(row, col) {
     let card = document.createElement('div');
     card.className = 'card_closed';
     card.id = 'card_' + row + '_' + col;
+    setCardEmoji(card, RESULT_EMOJI_ARRAY);
+    card.rear = '';
     setCardSize(card);
-    setEmoji(card, RESULT_EMOJI_ARRAY);
     return card;
 }
 
@@ -83,24 +97,16 @@ function setCardSize(card) {
     card.style.borderRadius = BORDER_RADIUS + 'px';
 }
 
-function setEmoji(card, arr) {
+function setCardEmoji(card, arr) {
     let arrIndex = Math.floor(Math.random() * arr.length);
     if (arr[arrIndex]) {
         card.emoji = arr[arrIndex];
         delete arr[arrIndex];
     } else if (arr) {
-        setEmoji(card, arr);
+        setCardEmoji(card, arr);
     } else {
         return;
     }
-}
-
-function setAnimation(cardsArr) {
-    cardsArr.forEach(function (item) {
-        item.addEventListener('click', function () {
-            turnCard(item);
-        })
-    });
 }
 
 function turnCard(card) {
@@ -111,16 +117,16 @@ function turnCard(card) {
         if (card.classList.contains('card_opened')) {
             card.textContent = card.emoji;
         } else {
-            card.textContent = '';
+            card.textContent = card.rear;
         }
     }, ANIMATION_DURATION / 2);
 }
 
 function animateCard(card) {
     if (card.classList.contains('card_opened')) {
-        animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION)
+        animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION);
     } else {
-        animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION, ANIMATION_FINISH_POSITION)
+        animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION, ANIMATION_FINISH_POSITION);
     }
 }
 
@@ -136,4 +142,58 @@ function animateCardSide(card, startPos, finishPos, finishTransformPos) {
     animation.addEventListener('finish', function () {
         card.style.transform = 'rotateY(' + finishTransformPos + ')';
     });
+}
+
+function compareOpenCards(openCard) {
+    if (openCard.classList.contains('card_closed')) {
+        OPEN_CARDS_ARRAY.push(openCard);
+    } else {
+        OPEN_CARDS_ARRAY.pop(openCard);
+    }
+    // If two cards opened, mark them as similar or different
+    if (OPEN_CARDS_ARRAY.length == 2) {
+        setOpenCardsColors(OPEN_CARDS_ARRAY, openCard);
+    }
+    // If third card opened, close first two different cards
+    if (OPEN_CARDS_ARRAY.length == 3) {
+        closeDifferentOpenedCards(OPEN_CARDS_ARRAY, openCard);
+        clearOpenCardsArray();
+        OPEN_CARDS_ARRAY.push(openCard);
+    }
+}
+
+function clearOpenCardsArray() {
+    OPEN_CARDS_ARRAY.length = 0;
+}
+
+function setOpenCardsColors(openCardsArr, openCard) {
+    openCardsArr.forEach(function (item) {
+        if (cardOpenedButNotGuessed(item) && differentCardsId(item, openCard)) {
+            if (item.emoji == openCard.emoji) {
+                item.classList.toggle('cards_are_same');
+                openCard.classList.toggle('cards_are_same');
+                clearOpenCardsArray();
+            } else {
+                item.classList.toggle('cards_are_different');
+                openCard.classList.toggle('cards_are_different');
+            }
+        }
+    });
+}
+
+function closeDifferentOpenedCards(openCardsArr, openCard) {
+    openCardsArr.forEach(function (item) {
+        if (item.classList.contains('cards_are_different') && differentCardsId(item, openCard)) {
+            item.classList.toggle('cards_are_different');
+            turnCard(item);
+        }
+    });
+}
+
+function differentCardsId(cardOne, cardTwo) {
+    return cardOne.id != cardTwo.id;
+}
+
+function cardOpenedButNotGuessed(card) {
+    return card.classList.contains('card_opened') && !card.classList.contains('cards_are_same');
 }

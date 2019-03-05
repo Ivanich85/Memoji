@@ -34,3 +34,13 @@ body {
     background: white;
     font-size: 75px;
 }
+
+.cards_are_same {
+    background-color: #5AD66F;
+    pointer-events: none;
+}
+
+.cards_are_different {
+    background-color: #F44336;
+    pointer-events: none;
+}
