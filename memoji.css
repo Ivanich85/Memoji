@@ -44,3 +44,10 @@ body {
     background-color: #F44336;
     pointer-events: none;
 }
+
+.timer {
+    text-align: center;
+    color: #434344;
+    line-height: 36px;
+    font: bold 32px Arial, sans-serif;
+}

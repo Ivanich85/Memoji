@@ -29,10 +29,16 @@ var RESULT_EMOJI_ARRAY = [];
 // The array used for open cards comparison
 var OPEN_CARDS_ARRAY = [];
 
-//  Prepare emojies and game field
+
 window.onload = function () {
+    prepareNewGame()
+}
+
+//  Prepare emojies and game field
+function prepareNewGame() {
     generateEmojiArray(EMOJI_ARRAY);
     buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);
+    setTimer(59);
 }
 
 /*  
@@ -197,3 +203,30 @@ function differentCardsId(cardOne, cardTwo) {
 function cardOpenedButNotGuessed(card) {
     return card.classList.contains('card_opened') && !card.classList.contains('cards_are_same');
 }
+
+// Таймер
+function setTimer(remainTime) { 
+    var prefix;
+    var timerText = document.querySelector(".timer");
+    prefix = getTimerPrefix(remainTime);
+    setTextContent(timerText, prefix, remainTime);
+    var timerId = setInterval(function() {
+        prefix = getTimerPrefix(remainTime);
+        remainTime = remainTime - 1;
+        setTextContent(timerText, prefix, remainTime);        
+    }, 1000);
+    
+    setTimeout(function() {
+        clearInterval(timerId);
+        timerText.textContent = "Бабах!!!!";
+    }, remainTime * 1000);
+}
+
+function getTimerPrefix(remainTime) {
+    return remainTime > 10 ? "00:" : "00:0";
+}
+
+function setTextContent(timerText, prefix, remainTime) {
+    timerText.textContent = prefix + (remainTime);
+}
+
