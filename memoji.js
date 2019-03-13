@@ -29,6 +29,10 @@ var RESULT_EMOJI_ARRAY = [];
 // The array used for open cards comparison
 var OPEN_CARDS_ARRAY = [];
 
+// Timer and countdown time
+var TIMER_ID = null;
+var REMAIN_TIME = 30; //sec
+var TIMER_START = false;
 
 window.onload = function () {
     prepareNewGame()
@@ -38,7 +42,7 @@ window.onload = function () {
 function prepareNewGame() {
     generateEmojiArray(EMOJI_ARRAY);
     buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);
-    setTimer(59);
+    setTimer(REMAIN_TIME);
 }
 
 /*  
@@ -82,6 +86,10 @@ function setFieldListener(field) {
             turnCard(target);
             compareOpenCards(target);
         }
+        if (!TIMER_START) {
+            TIMER_START = true;
+            setTimer(REMAIN_TIME);
+        }
     });
 }
 
@@ -123,7 +131,7 @@ function turnCard(card) {
         if (card.classList.contains('card_opened')) {
             card.textContent = card.emoji;
         } else {
-            card.textContent = card.rear;
+            card.textContent = card.emoji; // отладка
         }
     }, ANIMATION_DURATION / 2);
 }
@@ -163,13 +171,9 @@ function compareOpenCards(openCard) {
     // If third card opened, close first two different cards
     if (OPEN_CARDS_ARRAY.length == 3) {
         closeDifferentOpenedCards(OPEN_CARDS_ARRAY, openCard);
-        clearOpenCardsArray();
+        clearOpenCardsArray(OPEN_CARDS_ARRAY);
         OPEN_CARDS_ARRAY.push(openCard);
     }
-}
-
-function clearOpenCardsArray() {
-    OPEN_CARDS_ARRAY.length = 0;
 }
 
 function setOpenCardsColors(openCardsArr, openCard) {
@@ -178,7 +182,8 @@ function setOpenCardsColors(openCardsArr, openCard) {
             if (item.emoji == openCard.emoji) {
                 item.classList.toggle('cards_are_same');
                 openCard.classList.toggle('cards_are_same');
-                clearOpenCardsArray();
+                clearOpenCardsArray(OPEN_CARDS_ARRAY);
+                isWin();
             } else {
                 item.classList.toggle('cards_are_different');
                 openCard.classList.toggle('cards_are_different');
@@ -196,6 +201,10 @@ function closeDifferentOpenedCards(openCardsArr, openCard) {
     });
 }
 
+function clearOpenCardsArray(array) {
+    array.length = 0;
+}
+
 function differentCardsId(cardOne, cardTwo) {
     return cardOne.id != cardTwo.id;
 }
@@ -205,21 +214,18 @@ function cardOpenedButNotGuessed(card) {
 }
 
 // Таймер
-function setTimer(remainTime) { 
+function setTimer(remainTime) {
     var prefix;
     var timerText = document.querySelector(".timer");
     prefix = getTimerPrefix(remainTime);
-    setTextContent(timerText, prefix, remainTime);
-    var timerId = setInterval(function() {
-        prefix = getTimerPrefix(remainTime);
-        remainTime = remainTime - 1;
-        setTextContent(timerText, prefix, remainTime);        
-    }, 1000);
-    
-    setTimeout(function() {
-        clearInterval(timerId);
-        timerText.textContent = "Бабах!!!!";
-    }, remainTime * 1000);
+    setTextContent(timerText, "01:", "00");
+    if (TIMER_START) {
+        TIMER_ID = setInterval(function () {
+            prefix = getTimerPrefix(remainTime);
+            remainTime = checkTimer(remainTime);
+            setTextContent(timerText, prefix, remainTime);
+        }, 1000);
+    }
 }
 
 function getTimerPrefix(remainTime) {
@@ -229,4 +235,29 @@ function getTimerPrefix(remainTime) {
 function setTextContent(timerText, prefix, remainTime) {
     timerText.textContent = prefix + (remainTime);
 }
+
+function checkTimer(remainTime) {
+    if (remainTime > 0) {
+        remainTime = remainTime - 1;
+    } else {
+        clearInterval(TIMER_ID);
+        lose();
+    }
+    return remainTime;
+}
+
+function isWin() {
+    if (document.querySelectorAll('.cards_are_same').length == RESULT_EMOJI_ARRAY.length) {
+        clearInterval(TIMER_ID);
+        setTimeout(function () {
+            alert("ПОБЕДА!!!!!");
+        }, ANIMATION_DURATION);
+    }
+}
+
+function lose() {
+    alert("ПОРАЖЕНИЕ!");
+}
+
+
 
