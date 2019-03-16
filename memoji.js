@@ -31,18 +31,29 @@ var OPEN_CARDS_ARRAY = [];
 
 // Timer and countdown time
 var TIMER_ID = null;
-var REMAIN_TIME = 30; //sec
+var START_TIMER = 60; //sec
 var TIMER_START = false;
 
+// Listeners
+var GAME_FIELD = null;
+var BUTTON = null;
+
 window.onload = function () {
-    prepareNewGame()
+    prepareGame();
 }
 
-//  Prepare emojies and game field
-function prepareNewGame() {
+/**
+ * Prepare new game module
+ * ===============================================
+ */
+function prepareGame() {
+    clearGameField();
+    clearOpenCardsArray(RESULT_EMOJI_ARRAY);
+    clearOpenCardsArray(OPEN_CARDS_ARRAY);
     generateEmojiArray(EMOJI_ARRAY);
     buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);
-    setTimer(REMAIN_TIME);
+    resetTimer();
+    setTimer(START_TIMER);
 }
 
 /*  
@@ -77,20 +88,7 @@ function buildGameField(gameField, row, col) {
         }
     }
     setFieldListener(gameField);
-}
-
-function setFieldListener(field) {
-    field.addEventListener('click', function (event) {
-        var target = event.target;
-        if (target.classList.contains('card_closed') || target.classList.contains('card_opened')) {
-            turnCard(target);
-            compareOpenCards(target);
-        }
-        if (!TIMER_START) {
-            TIMER_START = true;
-            setTimer(REMAIN_TIME);
-        }
-    });
+    setButtonListener();
 }
 
 function createCard(row, col) {
@@ -123,6 +121,42 @@ function setCardEmoji(card, arr) {
     }
 }
 
+/**
+ * Listeners module
+ * ===============================================
+ */
+function setFieldListener() {
+    GAME_FIELD = document.querySelector('.game_field');
+    GAME_FIELD.addEventListener('click', fieldListener);
+}
+
+function fieldListener(event) {
+    var target = event.target;
+    if (target.classList.contains('card_closed') || target.classList.contains('card_opened')) {
+        turnCard(target);
+        compareOpenCards(target);
+    }
+    if (!TIMER_START) {
+        TIMER_START = true;
+        setTimer(START_TIMER);
+    }
+}
+
+function setButtonListener() {
+    BUTTON = document.querySelector('.play_again_button');
+    BUTTON.addEventListener('click', buttonListener);
+}
+
+function buttonListener() {
+    var fade = document.querySelector('.fade');
+    fade.style.display = 'none';
+    prepareNewGame();
+}
+
+/**
+ * Animation module
+ * ===============================================
+ */
 function turnCard(card) {
     animateCard(card);
     setTimeout(function () {
@@ -131,7 +165,7 @@ function turnCard(card) {
         if (card.classList.contains('card_opened')) {
             card.textContent = card.emoji;
         } else {
-            card.textContent = card.emoji; // отладка
+            card.textContent = card.rear;
         }
     }, ANIMATION_DURATION / 2);
 }
@@ -158,6 +192,10 @@ function animateCardSide(card, startPos, finishPos, finishTransformPos) {
     });
 }
 
+/**
+ * Game logic module
+ * ===============================================
+ */
 function compareOpenCards(openCard) {
     if (openCard.classList.contains('card_closed')) {
         OPEN_CARDS_ARRAY.push(openCard);
@@ -213,23 +251,27 @@ function cardOpenedButNotGuessed(card) {
     return card.classList.contains('card_opened') && !card.classList.contains('cards_are_same');
 }
 
-// Таймер
+/**
+ * Timer module
+ * ===============================================
+ */
 function setTimer(remainTime) {
     var prefix;
-    var timerText = document.querySelector(".timer");
+    var timerText = document.querySelector('.timer');
+    var time = remainTime;
     prefix = getTimerPrefix(remainTime);
-    setTextContent(timerText, "01:", "00");
+    setTextContent(timerText, '01:', '00');
     if (TIMER_START) {
         TIMER_ID = setInterval(function () {
-            prefix = getTimerPrefix(remainTime);
-            remainTime = checkTimer(remainTime);
-            setTextContent(timerText, prefix, remainTime);
+            prefix = getTimerPrefix(time);
+            time = checkTimer(time);
+            setTextContent(timerText, prefix, time);
         }, 1000);
     }
 }
 
 function getTimerPrefix(remainTime) {
-    return remainTime > 10 ? "00:" : "00:0";
+    return remainTime > 10 ? '00:' : '00:0';
 }
 
 function setTextContent(timerText, prefix, remainTime) {
@@ -246,18 +288,56 @@ function checkTimer(remainTime) {
     return remainTime;
 }
 
+
+/**
+ * End game module
+ * ===============================================
+ */
 function isWin() {
     if (document.querySelectorAll('.cards_are_same').length == RESULT_EMOJI_ARRAY.length) {
         clearInterval(TIMER_ID);
         setTimeout(function () {
-            alert("ПОБЕДА!!!!!");
+            showEndGameWindow('Win', 'Play again');
         }, ANIMATION_DURATION);
     }
 }
 
 function lose() {
-    alert("ПОРАЖЕНИЕ!");
+    showEndGameWindow('Lose', 'Try again');
 }
 
+function showEndGameWindow(resumeText, buttonText) {
+    var fade = document.querySelector('.fade');
+    var text = fade.querySelector('.text_result');
+    var button = fade.querySelector('.play_again_button');
+    text.textContent = resumeText;
+    button.textContent = buttonText;
+    fade.style.display = 'flex';
+}
 
+/**
+ * Restart game module
+ * ===============================================
+ */
+function prepareNewGame() {
+    closeAllOpenCards();
+    // Clean and shuffle after close
+    setTimeout(function () {
+        prepareGame();
+    }, ANIMATION_DURATION);
+}
 
+function closeAllOpenCards() {
+    var openCards = Array.from(document.querySelectorAll('.card_opened'));
+    openCards.forEach(function (item) {
+        turnCard(item);
+    });
+}
+
+function clearGameField() {
+    document.querySelector('.game_field').innerHTML = '';
+}
+
+function resetTimer() {
+    TIMER_START = false;
+}

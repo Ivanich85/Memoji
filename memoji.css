@@ -1,13 +1,15 @@
 body {
     background-color: #cfd0cf;
     margin: auto;
+    -webkit-user-select: none;
 }
+
 
 .game_header {
     text-align: center;
     color: #434344;
     line-height: 47px;
-    font: bold 42px Arial, sans-serif;
+    font: bold 42px Arial, sans-serif;    
 }
 
 .game_field {
@@ -50,4 +52,47 @@ body {
     color: #434344;
     line-height: 36px;
     font: bold 32px Arial, sans-serif;
+
 }
+
+.fade {
+    display: none;
+    position: fixed;
+    top: 0%;
+    right: 0%;
+    height: 100%;
+    width: 100%;
+    background-color:rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.result_window {
+    margin: auto;
+    width: 350px;
+    background-color: white;
+    text-align: center;
+}
+
+.text_result {
+    color: #434344;
+    line-height: 58px;
+    font: bold 48px Arial, sans-serif;
+    padding: 30px 0 10px 0;
+}
+
+.play_again_button {    
+    color: white;
+    font: bold 20px Arial, sans-serif;
+    padding: 10px 30px;
+    margin: 30px;
+    background: linear-gradient(90deg, #16668d, #22ab93);
+    border: 0px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    outline: none;
+}
+
+.play_again_button:active {
+    box-shadow: inset 2px 1px 8px rgba(0, 0, 0, 0.5);
+}
+
