@@ -96,3 +96,8 @@ body {
     box-shadow: inset 2px 1px 8px rgba(0, 0, 0, 0.5);
 }
 
+@keyframes animate_game_result_message {
+    100% {
+        transform: scaleY(1.40) translateY(-10px);
+    }
+}

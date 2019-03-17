@@ -11,8 +11,18 @@ var CARD_BORDER = 5;
 var BORDER_RADIUS = 9;
 var BORDER_COLOR = '#FFFFFF';
 
+// Card classes
+var CARD_OPENED = 'card_opened';
+var CARD_CLOSED = 'card_closed';
+var CARDS_ARE_DIFFERENT = 'cards_are_different';
+var CARDS_ARE_SAME = 'cards_are_same';
+
+// Listeners
+var GAME_FIELD = null;
+var BUTTON = null;
+
 //  Animation preferences
-var ANIMATION_DURATION = 300;
+var ANIMATION_DURATION = 260;
 var ANIMATION_START_POSITION = '0';
 var ANIMATION_MIDDLE_POSITION = '180deg';
 var ANIMATION_FINISH_POSITION = '360deg';
@@ -34,20 +44,21 @@ var TIMER_ID = null;
 var START_TIMER = 60; //sec
 var TIMER_START = false;
 
-// Listeners
-var GAME_FIELD = null;
-var BUTTON = null;
+// Game result texts
+var BUTTON_TEXT_WIN = 'Play again';
+var BUTTON_TEXT_LOSE = 'Try again';
+var TEXT_WIN = 'Win';
+var TEXT_LOSE = 'Lose';
 
+// Start first game
 window.onload = function () {
     prepareGame();
 }
 
-/**
- * Prepare new game module
- * ===============================================
- */
+// Prepare new game module
 function prepareGame() {
     clearGameField();
+    clearTextResult();
     clearOpenCardsArray(RESULT_EMOJI_ARRAY);
     clearOpenCardsArray(OPEN_CARDS_ARRAY);
     generateEmojiArray(EMOJI_ARRAY);
@@ -56,7 +67,7 @@ function prepareGame() {
     setTimer(START_TIMER);
 }
 
-/*  
+/**
     This method takes 'CARD_QUANTITY / 2' random emojies from 'MAIN_EMOJI_ARRAY' 
     and puts them to the result array 'RESULT_EMOJI_ARRAY'
     After that the method multiplies the result by two, because we need two similar emoji into the array
@@ -93,7 +104,7 @@ function buildGameField(gameField, row, col) {
 
 function createCard(row, col) {
     let card = document.createElement('div');
-    card.className = 'card_closed';
+    card.className = CARD_CLOSED;
     card.id = 'card_' + row + '_' + col;
     setCardEmoji(card, RESULT_EMOJI_ARRAY);
     card.rear = '';
@@ -121,10 +132,7 @@ function setCardEmoji(card, arr) {
     }
 }
 
-/**
- * Listeners module
- * ===============================================
- */
+// Listeners 
 function setFieldListener() {
     GAME_FIELD = document.querySelector('.game_field');
     GAME_FIELD.addEventListener('click', fieldListener);
@@ -132,7 +140,7 @@ function setFieldListener() {
 
 function fieldListener(event) {
     var target = event.target;
-    if (target.classList.contains('card_closed') || target.classList.contains('card_opened')) {
+    if (target.classList.contains(CARD_CLOSED) || target.classList.contains(CARD_OPENED)) {
         turnCard(target);
         compareOpenCards(target);
     }
@@ -153,16 +161,13 @@ function buttonListener() {
     prepareNewGame();
 }
 
-/**
- * Animation module
- * ===============================================
- */
+// Animation module
 function turnCard(card) {
     animateCard(card);
     setTimeout(function () {
-        card.classList.toggle('card_closed');
-        card.classList.toggle('card_opened');
-        if (card.classList.contains('card_opened')) {
+        card.classList.toggle(CARD_CLOSED);
+        card.classList.toggle(CARD_OPENED);
+        if (card.classList.contains(CARD_OPENED)) {
             card.textContent = card.emoji;
         } else {
             card.textContent = card.rear;
@@ -171,7 +176,7 @@ function turnCard(card) {
 }
 
 function animateCard(card) {
-    if (card.classList.contains('card_opened')) {
+    if (card.classList.contains(CARD_OPENED)) {
         animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION);
     } else {
         animateCardSide(card, ANIMATION_MIDDLE_POSITION, ANIMATION_FINISH_POSITION, ANIMATION_FINISH_POSITION);
@@ -192,12 +197,9 @@ function animateCardSide(card, startPos, finishPos, finishTransformPos) {
     });
 }
 
-/**
- * Game logic module
- * ===============================================
- */
+// Game logic module
 function compareOpenCards(openCard) {
-    if (openCard.classList.contains('card_closed')) {
+    if (openCard.classList.contains(CARD_CLOSED)) {
         OPEN_CARDS_ARRAY.push(openCard);
     } else {
         OPEN_CARDS_ARRAY.pop(openCard);
@@ -218,13 +220,13 @@ function setOpenCardsColors(openCardsArr, openCard) {
     openCardsArr.forEach(function (item) {
         if (cardOpenedButNotGuessed(item) && differentCardsId(item, openCard)) {
             if (item.emoji == openCard.emoji) {
-                item.classList.toggle('cards_are_same');
-                openCard.classList.toggle('cards_are_same');
+                item.classList.toggle(CARDS_ARE_SAME);
+                openCard.classList.toggle(CARDS_ARE_SAME);
                 clearOpenCardsArray(OPEN_CARDS_ARRAY);
                 isWin();
             } else {
-                item.classList.toggle('cards_are_different');
-                openCard.classList.toggle('cards_are_different');
+                item.classList.toggle(CARDS_ARE_DIFFERENT);
+                openCard.classList.toggle(CARDS_ARE_DIFFERENT);
             }
         }
     });
@@ -232,8 +234,8 @@ function setOpenCardsColors(openCardsArr, openCard) {
 
 function closeDifferentOpenedCards(openCardsArr, openCard) {
     openCardsArr.forEach(function (item) {
-        if (item.classList.contains('cards_are_different') && differentCardsId(item, openCard)) {
-            item.classList.toggle('cards_are_different');
+        if (item.classList.contains(CARDS_ARE_DIFFERENT) && differentCardsId(item, openCard)) {
+            item.classList.toggle(CARDS_ARE_DIFFERENT);
             turnCard(item);
         }
     });
@@ -248,13 +250,10 @@ function differentCardsId(cardOne, cardTwo) {
 }
 
 function cardOpenedButNotGuessed(card) {
-    return card.classList.contains('card_opened') && !card.classList.contains('cards_are_same');
+    return card.classList.contains(CARD_OPENED) && !card.classList.contains(CARDS_ARE_SAME);
 }
 
-/**
- * Timer module
- * ===============================================
- */
+// Timer module
 function setTimer(remainTime) {
     var prefix;
     var timerText = document.querySelector('.timer');
@@ -288,37 +287,48 @@ function checkTimer(remainTime) {
     return remainTime;
 }
 
-
-/**
- * End game module
- * ===============================================
- */
+// Game result module
 function isWin() {
-    if (document.querySelectorAll('.cards_are_same').length == RESULT_EMOJI_ARRAY.length) {
+    if (document.querySelectorAll('.' + CARDS_ARE_SAME).length == RESULT_EMOJI_ARRAY.length) {
         clearInterval(TIMER_ID);
         setTimeout(function () {
-            showEndGameWindow('Win', 'Play again');
+            showEndGameWindow(TEXT_WIN, BUTTON_TEXT_WIN);
         }, ANIMATION_DURATION);
     }
 }
 
 function lose() {
-    showEndGameWindow('Lose', 'Try again');
+    showEndGameWindow(TEXT_LOSE, BUTTON_TEXT_LOSE);
 }
 
 function showEndGameWindow(resumeText, buttonText) {
     var fade = document.querySelector('.fade');
-    var text = fade.querySelector('.text_result');
     var button = fade.querySelector('.play_again_button');
-    text.textContent = resumeText;
     button.textContent = buttonText;
     fade.style.display = 'flex';
+    animateGameResultMessage(resumeText);
 }
 
-/**
- * Restart game module
- * ===============================================
- */
+function animateGameResultMessage(message) {
+    message.split('').forEach(function (item, i) {
+        var textResult = document.querySelector('.text_result');
+        var testResultChild = textResult.appendChild(document.createElement('div'));
+        setTextResultChildStyle(testResultChild, item, i);
+    });
+}
+
+function setTextResultChildStyle(textResultChild, letter, letterNumber) {
+    textResultChild.textContent = letter;
+    textResultChild.style.animation = "animate_game_result_message";
+    textResultChild.style.animationDuration = "0.5s";
+    textResultChild.style.animationDirection = "alternate";
+    textResultChild.style.animationIterationCount = "infinite";
+    textResultChild.style.animationDelay = letterNumber / 10 + 's';
+    textResultChild.style.display = "inline-block";
+    return textResultChild;
+}
+
+// Restart game module
 function prepareNewGame() {
     closeAllOpenCards();
     // Clean and shuffle after close
@@ -328,7 +338,7 @@ function prepareNewGame() {
 }
 
 function closeAllOpenCards() {
-    var openCards = Array.from(document.querySelectorAll('.card_opened'));
+    var openCards = Array.from(document.querySelectorAll('.' + CARD_OPENED));
     openCards.forEach(function (item) {
         turnCard(item);
     });
@@ -336,6 +346,10 @@ function closeAllOpenCards() {
 
 function clearGameField() {
     document.querySelector('.game_field').innerHTML = '';
+}
+
+function clearTextResult() {
+    document.querySelector('.text_result').innerHTML = '';
 }
 
 function resetTimer() {
