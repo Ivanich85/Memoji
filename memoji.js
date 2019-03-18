@@ -1,7 +1,12 @@
-//  Game field parameters
-var NUMBER_OF_LINES = 3;
-var NUMBER_OF_COLUMNS = 4;
-var NUMBER_OF_CARDS = NUMBER_OF_LINES * NUMBER_OF_COLUMNS;
+//  Initialized game parameters. They depend on difficult level
+var NUMBER_OF_LINES;
+var NUMBER_OF_COLUMNS;
+var NUMBER_OF_CARDS;
+var START_TIMER; // seconds
+
+var EASY_MODE = 'easy_mode';
+var NORMAL_MODE = 'normal_mode';
+var HARD_MODE = 'hard_mode';
 
 //  The card geometry parameters and border color
 var CARD_WIDTH = 120;
@@ -20,6 +25,7 @@ var CARDS_ARE_SAME = 'cards_are_same';
 // Listeners
 var GAME_FIELD = null;
 var BUTTON = null;
+var START_GAME_BUTTON = null;
 
 //  Animation preferences
 var ANIMATION_DURATION = 260;
@@ -41,30 +47,51 @@ var OPEN_CARDS_ARRAY = [];
 
 // Timer and countdown time
 var TIMER_ID = null;
-var START_TIMER = 60; //sec
 var TIMER_START = false;
 
 // Game result texts
 var BUTTON_TEXT_WIN = 'Play again';
 var BUTTON_TEXT_LOSE = 'Try again';
-var TEXT_WIN = 'Win';
-var TEXT_LOSE = 'Lose';
+var TEXT_WIN = 'You win!';
+var TEXT_LOSE = 'You lose!';
 
-// Start first game
+
 window.onload = function () {
-    prepareGame();
+    startGameButtonListener();
 }
-
 // Prepare new game module
-function prepareGame() {
+function prepareGame() {    
     clearGameField();
     clearTextResult();
     clearOpenCardsArray(RESULT_EMOJI_ARRAY);
     clearOpenCardsArray(OPEN_CARDS_ARRAY);
+    initGameParams();
     generateEmojiArray(EMOJI_ARRAY);
     buildGameField(setGameFieldWidth(NUMBER_OF_COLUMNS), NUMBER_OF_LINES, NUMBER_OF_COLUMNS);
     resetTimer();
     setTimer(START_TIMER);
+}
+
+function initGameParams() {
+    var gameModeRadioButtons = document.getElementsByName('mode');
+    Array.from(gameModeRadioButtons).forEach(function (item) {
+        if (item.checked) {
+            if (item.classList.contains(EASY_MODE)) {
+                NUMBER_OF_LINES = 3;
+                NUMBER_OF_COLUMNS = 4;
+                START_TIMER = 40;
+            } else if (item.classList.contains(NORMAL_MODE)) {
+                NUMBER_OF_LINES = 3;
+                NUMBER_OF_COLUMNS = 6;
+                START_TIMER = 65;
+            } else if (item.classList.contains(HARD_MODE)) {
+                NUMBER_OF_LINES = 3;
+                NUMBER_OF_COLUMNS = 8;
+                START_TIMER = 90;
+            }        
+            NUMBER_OF_CARDS = NUMBER_OF_LINES * NUMBER_OF_COLUMNS;
+        }
+    });
 }
 
 /**
@@ -92,7 +119,7 @@ function setGameFieldWidth(columns) {
     return field;
 }
 
-function buildGameField(gameField, row, col) {
+function buildGameField(gameField, row, col) {    
     for (var i = 0; i < row; i++) {
         for (var j = 0; j < col; j++) {
             gameField.appendChild(createCard(i, j));
@@ -102,7 +129,7 @@ function buildGameField(gameField, row, col) {
     setButtonListener();
 }
 
-function createCard(row, col) {
+function createCard(row, col) {    
     let card = document.createElement('div');
     card.className = CARD_CLOSED;
     card.id = 'card_' + row + '_' + col;
@@ -159,6 +186,17 @@ function buttonListener() {
     var fade = document.querySelector('.fade');
     fade.style.display = 'none';
     prepareNewGame();
+}
+
+function startGameButtonListener() {
+    START_GAME_BUTTON = document.querySelector('.game_start_button');
+    START_GAME_BUTTON.addEventListener('click', startButtonListener);
+}
+
+function startButtonListener() {
+    var mainMenu = document.querySelector('.main_menu');
+    mainMenu.style.display = 'none';
+    prepareGame();
 }
 
 // Animation module
@@ -255,26 +293,36 @@ function cardOpenedButNotGuessed(card) {
 
 // Timer module
 function setTimer(remainTime) {
-    var prefix;
     var timerText = document.querySelector('.timer');
     var time = remainTime;
-    prefix = getTimerPrefix(remainTime);
-    setTextContent(timerText, '01:', '00');
+    var minutes = getMinutes(minutes, remainTime);
+    var seconds = getSeconds(seconds, remainTime);
+    timerText.textContent = showCountdown(minutes, seconds, time);
     if (TIMER_START) {
         TIMER_ID = setInterval(function () {
-            prefix = getTimerPrefix(time);
             time = checkTimer(time);
-            setTextContent(timerText, prefix, time);
+            timerText.textContent = showCountdown(minutes, seconds, time);
         }, 1000);
     }
 }
 
-function getTimerPrefix(remainTime) {
-    return remainTime > 10 ? '00:' : '00:0';
+function showCountdown(minutes, seconds, time) {
+    return getMinutes(minutes, time) + ':' + getSeconds(seconds, time);
 }
 
-function setTextContent(timerText, prefix, remainTime) {
-    timerText.textContent = prefix + (remainTime);
+function getMinutes(minutes, time) {
+    minutes = parseInt(time / 60);
+    return getMinutesAndSecondsPrefix(minutes) + minutes;
+}
+
+function getSeconds(seconds, time) {
+    seconds = time % 60;
+    return getMinutesAndSecondsPrefix(seconds) + seconds;
+
+}
+
+function getMinutesAndSecondsPrefix(minutesOrSeconds) {
+    return minutesOrSeconds < 10 ? '0' : '';
 }
 
 function checkTimer(remainTime) {
@@ -302,10 +350,8 @@ function lose() {
 }
 
 function showEndGameWindow(resumeText, buttonText) {
-    var fade = document.querySelector('.fade');
-    var button = fade.querySelector('.play_again_button');
-    button.textContent = buttonText;
-    fade.style.display = 'flex';
+    document.querySelector('.fade').style.display = 'flex';
+    document.querySelector('.play_again_button').textContent = buttonText;
     animateGameResultMessage(resumeText);
 }
 
@@ -319,12 +365,16 @@ function animateGameResultMessage(message) {
 
 function setTextResultChildStyle(textResultChild, letter, letterNumber) {
     textResultChild.textContent = letter;
-    textResultChild.style.animation = "animate_game_result_message";
-    textResultChild.style.animationDuration = "0.5s";
-    textResultChild.style.animationDirection = "alternate";
-    textResultChild.style.animationIterationCount = "infinite";
+    if (letter == ' ') {
+        textResultChild.style.display = 'inline'; // If display is inline-block, bsp disappears 
+        return textResultChild;
+    }
+    textResultChild.style.animation = 'animate_game_result_message';
+    textResultChild.style.animationDuration = '0.5s';
+    textResultChild.style.animationDirection = 'alternate';
+    textResultChild.style.animationIterationCount = 'infinite';
     textResultChild.style.animationDelay = letterNumber / 10 + 's';
-    textResultChild.style.display = "inline-block";
+    textResultChild.style.display = 'inline-block';
     return textResultChild;
 }
 
