@@ -23,9 +23,9 @@ var CARDS_ARE_DIFFERENT = 'cards_are_different';
 var CARDS_ARE_SAME = 'cards_are_same';
 
 // Listeners
-var GAME_FIELD = null;
-var BUTTON = null;
-var START_GAME_BUTTON = null;
+var GAME_FIELD;
+var BUTTON;
+var START_GAME_BUTTON;
 
 //  Animation preferences
 var ANIMATION_DURATION = 260;
@@ -50,17 +50,19 @@ var TIMER_ID = null;
 var TIMER_START = false;
 
 // Game result texts
-var BUTTON_TEXT_WIN = 'Play again';
-var BUTTON_TEXT_LOSE = 'Try again';
-var TEXT_WIN = 'You win!';
-var TEXT_LOSE = 'You lose!';
-
+var BUTTON_TEXT_WIN = 'Играть снова';
+var BUTTON_TEXT_LOSE = 'Попробовать еще раз';
+var TEXT_WIN = 'Победа!';
+var TEXT_LOSE = 'Поражение...';
 
 window.onload = function () {
+    setDifficultLevel();
     startGameButtonListener();
+    difficultLevelRadioListener();
 }
+
 // Prepare new game module
-function prepareGame() {    
+function prepareGame() {
     clearGameField();
     clearTextResult();
     clearOpenCardsArray(RESULT_EMOJI_ARRAY);
@@ -87,8 +89,8 @@ function initGameParams() {
             } else if (item.classList.contains(HARD_MODE)) {
                 NUMBER_OF_LINES = 3;
                 NUMBER_OF_COLUMNS = 8;
-                START_TIMER = 90;
-            }        
+                START_TIMER = 100;
+            }
             NUMBER_OF_CARDS = NUMBER_OF_LINES * NUMBER_OF_COLUMNS;
         }
     });
@@ -119,7 +121,7 @@ function setGameFieldWidth(columns) {
     return field;
 }
 
-function buildGameField(gameField, row, col) {    
+function buildGameField(gameField, row, col) {
     for (var i = 0; i < row; i++) {
         for (var j = 0; j < col; j++) {
             gameField.appendChild(createCard(i, j));
@@ -127,9 +129,10 @@ function buildGameField(gameField, row, col) {
     }
     setFieldListener(gameField);
     setButtonListener();
+    setMainMenuButtonListener();
 }
 
-function createCard(row, col) {    
+function createCard(row, col) {
     let card = document.createElement('div');
     card.className = CARD_CLOSED;
     card.id = 'card_' + row + '_' + col;
@@ -197,6 +200,35 @@ function startButtonListener() {
     var mainMenu = document.querySelector('.main_menu');
     mainMenu.style.display = 'none';
     prepareGame();
+}
+
+function difficultLevelRadioListener() {
+    var gameModeRadioButtons = document.getElementsByName('mode');
+    Array.from(gameModeRadioButtons).forEach(function (item) {
+        item.addEventListener('click', setDifficultLevel);
+    });
+}
+
+function setDifficultLevel() {
+    var gameModeRadioButtons = document.getElementsByName('mode');
+    var chooseLevelText = document.querySelector('.choose_level_text');
+    Array.from(gameModeRadioButtons).forEach(function (item) {
+        if (item.checked) {
+            if (item.classList.contains(EASY_MODE)) {
+                chooseLevelText.textContent = 'Низкий уровень сложности';
+            } else if (item.classList.contains(NORMAL_MODE)) {
+                chooseLevelText.textContent = 'Средний уровень сложности';
+            } else if (item.classList.contains(HARD_MODE)) {
+                chooseLevelText.textContent = 'Высокий уровень сложности';
+            }
+        }
+    });
+}
+
+function setMainMenuButtonListener() {
+    document.querySelector('.main_menu_button').addEventListener('click', function () {
+        window.location.reload();
+    });
 }
 
 // Animation module
