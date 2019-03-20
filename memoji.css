@@ -1,63 +1,30 @@
+/* Common styles */
 body {
     background-color: #cfd0cf;
     margin: auto;
     -webkit-user-select: none;
+    -moz-user-select: none;
     font: 60px 'Chewy', cursive;
     color: #293642;
 }
 
-.game_field {
-    display: flex;
-    margin: 42px auto;
-    flex-wrap: wrap;
+.button {  
+    font: 20px 'Chewy', cursive;   
+    color: rgb(255, 253, 226);
+    padding: 8px 30px;
+    margin: 10px;
+    background: linear-gradient(90deg, #16668d, #22ab93);
+    border: 0px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    outline: none;
 }
 
-.game_field > div {
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-    perspective: 600px;
+.button:active {
+    box-shadow: inset 2px 1px 8px rgba(0, 0, 0, 0.5);
 }
 
-.game_field > div:hover {
-    opacity: 0.9;
-}
-
-.card_closed {
-    background: linear-gradient(45deg, #22ab93, #16668d);
-}
-
-.card_opened {
-    text-align: center;
-    background: white;
-    font-size: 75px;
-}
-
-.cards_are_same {
-    background-color: #5AD66F;
-    pointer-events: none;
-}
-
-.cards_are_different {
-    background-color: #F44336;
-    pointer-events: none;
-}
-
-.timer {
-    text-align: center;
-    line-height: 36px;
-    font-size: 32px;
-}
-
-.fade {
-    display: none;
-    position: fixed;
-    top: 0%;
-    right: 0%;
-    height: 100%;
-    width: 100%;
-    background-color:rgba(0, 0, 0, 0.4);
-    z-index: 1;
-}
-
+/* Main menu */
 .main_menu {
     display: flex;
     position: fixed;
@@ -67,15 +34,6 @@ body {
     width: 100%;
     background: linear-gradient(-60deg, #2b6f91, #4aa594);
     z-index: 2;
-}
-
-.difficult_levels {
-    margin: -30px 0 0 0;
-}
-
-.choose_level_text {
-    font-size: 20px;
-    margin: 20px 0 15px 0;
 }
 
 .menu_frame {
@@ -102,9 +60,13 @@ body {
     margin-top: -35px;
 }
 
+.difficult_levels {
+    margin: -30px 0 0 0;
+}
+
 label {
     display: inline-block;
-    margin: 10px 15px 0px 15px;
+    margin: 10px 20px 0px 15px;
     border-radius: 10px; 
 }
 
@@ -146,6 +108,80 @@ input[type=radio]:checked + label {
     transform: rotateZ(11deg);
 }
 
+.choose_level_text {
+    font-size: 20px;
+    margin: 20px 0 15px 0;
+}
+
+.game_start_button {
+    margin-top: 60px;
+    font-size: 25px;
+    background: #30a0a0;
+}
+
+@keyframes animate_difficult_level {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(11deg);
+    }
+}
+
+/* Game field */
+.game_field {
+    display: flex;
+    margin: 42px auto;
+    flex-wrap: wrap;
+}
+
+.game_field > div {
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    perspective: 600px;
+}
+
+.game_field > div:hover {
+    opacity: 0.9;
+}
+
+.card_closed {
+    background: linear-gradient(45deg, #22ab93, #16668d);
+}
+
+.card_opened {
+    text-align: center;
+    background: white;
+    font-size: 75px;
+}
+
+.cards_are_same {
+    background-color: #5AD66F;
+    pointer-events: none;
+}
+
+.cards_are_different {
+    background-color: #F44336;
+    pointer-events: none;
+}
+
+.timer {
+    text-align: center;
+    line-height: 36px;
+    font-size: 32px;
+}
+
+/* Result window */
+.fade {
+    display: none;
+    position: fixed;
+    top: 0%;
+    right: 0%;
+    height: 100%;
+    width: 100%;
+    background-color:rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
 .result_window {
     margin: auto;
     min-width: 350px;
@@ -162,39 +198,9 @@ input[type=radio]:checked + label {
     margin-bottom: 10px;
 }
 
-.button {  
-    font: 20px 'Chewy', cursive;   
-    color: rgb(255, 253, 226);
-    padding: 8px 30px;
-    margin: 10px;
-    background: linear-gradient(90deg, #16668d, #22ab93);
-    border: 0px;
-    border-radius: 10px;
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    outline: none;
-}
-
-.button:active {
-    box-shadow: inset 2px 1px 8px rgba(0, 0, 0, 0.5);
-}
-
-.game_start_button {
-    margin-top: 60px;
-    font-size: 25px;
-    background: #30a0a0;
-}
-
 @keyframes animate_game_result_message {
     100% {
         transform: scaleY(1.40) translateY(-10px);
     }
 }
 
-@keyframes animate_difficult_level {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(11deg);
-    }
-}

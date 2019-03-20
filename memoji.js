@@ -24,7 +24,7 @@ var CARDS_ARE_SAME = 'cards_are_same';
 
 // Listeners
 var GAME_FIELD;
-var BUTTON;
+var PLAY_AGAIN_BUTTON;
 var START_GAME_BUTTON;
 
 //  Animation preferences
@@ -56,9 +56,48 @@ var TEXT_WIN = 'Победа!';
 var TEXT_LOSE = 'Поражение...';
 
 window.onload = function () {
+    prepareMainMenu();
+}
+
+// Main menu module
+function prepareMainMenu() {
     setDifficultLevel();
-    startGameButtonListener();
     difficultLevelRadioListener();
+    startGameButtonListener();
+}
+
+function difficultLevelRadioListener() {
+    var gameModeRadioButtons = document.getElementsByName('mode');
+    Array.from(gameModeRadioButtons).forEach(function (item) {
+        item.addEventListener('click', setDifficultLevel);
+    });
+}
+
+function setDifficultLevel() {
+    var gameModeRadioButtons = document.getElementsByName('mode');
+    var chooseLevelText = document.querySelector('.choose_level_text');
+    Array.from(gameModeRadioButtons).forEach(function (item) {
+        if (item.checked) {
+            if (item.classList.contains(EASY_MODE)) {
+                chooseLevelText.textContent = 'Низкий уровень сложности';
+            } else if (item.classList.contains(NORMAL_MODE)) {
+                chooseLevelText.textContent = 'Средний уровень сложности';
+            } else if (item.classList.contains(HARD_MODE)) {
+                chooseLevelText.textContent = 'Высокий уровень сложности';
+            }
+        }
+    });
+}
+
+function startGameButtonListener() {
+    START_GAME_BUTTON = document.querySelector('.game_start_button');
+    START_GAME_BUTTON.addEventListener('click', startButtonListener);
+}
+
+function startButtonListener() {
+    var mainMenu = document.querySelector('.main_menu');
+    mainMenu.style.display = 'none';
+    prepareGame();
 }
 
 // Prepare new game module
@@ -128,8 +167,6 @@ function buildGameField(gameField, row, col) {
         }
     }
     setFieldListener(gameField);
-    setButtonListener();
-    setMainMenuButtonListener();
 }
 
 function createCard(row, col) {
@@ -162,7 +199,6 @@ function setCardEmoji(card, arr) {
     }
 }
 
-// Listeners 
 function setFieldListener() {
     GAME_FIELD = document.querySelector('.game_field');
     GAME_FIELD.addEventListener('click', fieldListener);
@@ -180,57 +216,6 @@ function fieldListener(event) {
     }
 }
 
-function setButtonListener() {
-    BUTTON = document.querySelector('.play_again_button');
-    BUTTON.addEventListener('click', buttonListener);
-}
-
-function buttonListener() {
-    var fade = document.querySelector('.fade');
-    fade.style.display = 'none';
-    prepareNewGame();
-}
-
-function startGameButtonListener() {
-    START_GAME_BUTTON = document.querySelector('.game_start_button');
-    START_GAME_BUTTON.addEventListener('click', startButtonListener);
-}
-
-function startButtonListener() {
-    var mainMenu = document.querySelector('.main_menu');
-    mainMenu.style.display = 'none';
-    prepareGame();
-}
-
-function difficultLevelRadioListener() {
-    var gameModeRadioButtons = document.getElementsByName('mode');
-    Array.from(gameModeRadioButtons).forEach(function (item) {
-        item.addEventListener('click', setDifficultLevel);
-    });
-}
-
-function setDifficultLevel() {
-    var gameModeRadioButtons = document.getElementsByName('mode');
-    var chooseLevelText = document.querySelector('.choose_level_text');
-    Array.from(gameModeRadioButtons).forEach(function (item) {
-        if (item.checked) {
-            if (item.classList.contains(EASY_MODE)) {
-                chooseLevelText.textContent = 'Низкий уровень сложности';
-            } else if (item.classList.contains(NORMAL_MODE)) {
-                chooseLevelText.textContent = 'Средний уровень сложности';
-            } else if (item.classList.contains(HARD_MODE)) {
-                chooseLevelText.textContent = 'Высокий уровень сложности';
-            }
-        }
-    });
-}
-
-function setMainMenuButtonListener() {
-    document.querySelector('.main_menu_button').addEventListener('click', function () {
-        window.location.reload();
-    });
-}
-
 // Animation module
 function turnCard(card) {
     animateCard(card);
@@ -245,6 +230,9 @@ function turnCard(card) {
     }, ANIMATION_DURATION / 2);
 }
 
+// =====================================
+// Не работает в Mozilla Firefox. Убрать эту порнографию в css
+// =====================================
 function animateCard(card) {
     if (card.classList.contains(CARD_OPENED)) {
         animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION);
@@ -266,6 +254,10 @@ function animateCardSide(card, startPos, finishPos, finishTransformPos) {
         card.style.transform = 'rotateY(' + finishTransformPos + ')';
     });
 }
+// =====================================
+// Не работает в Mozilla Firefox. Убрать эту порнографию в css
+// =====================================
+
 
 // Game logic module
 function compareOpenCards(openCard) {
@@ -385,6 +377,8 @@ function showEndGameWindow(resumeText, buttonText) {
     document.querySelector('.fade').style.display = 'flex';
     document.querySelector('.play_again_button').textContent = buttonText;
     animateGameResultMessage(resumeText);
+    setPlayAgainButtonListener();
+    setMainMenuButtonListener();
 }
 
 function animateGameResultMessage(message) {
@@ -408,6 +402,23 @@ function setTextResultChildStyle(textResultChild, letter, letterNumber) {
     textResultChild.style.animationDelay = letterNumber / 10 + 's';
     textResultChild.style.display = 'inline-block';
     return textResultChild;
+}
+
+function setPlayAgainButtonListener() {
+    PLAY_AGAIN_BUTTON = document.querySelector('.play_again_button');
+    PLAY_AGAIN_BUTTON.addEventListener('click', playAgainButtonListener);
+}
+
+function playAgainButtonListener() {
+    var fade = document.querySelector('.fade');
+    fade.style.display = 'none';
+    prepareNewGame();
+}
+
+function setMainMenuButtonListener() {
+    document.querySelector('.main_menu_button').addEventListener('click', function () {
+        window.location.reload();
+    });
 }
 
 // Restart game module
