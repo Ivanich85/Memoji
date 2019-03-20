@@ -230,9 +230,6 @@ function turnCard(card) {
     }, ANIMATION_DURATION / 2);
 }
 
-// =====================================
-// Не работает в Mozilla Firefox. Убрать эту порнографию в css
-// =====================================
 function animateCard(card) {
     if (card.classList.contains(CARD_OPENED)) {
         animateCardSide(card, ANIMATION_START_POSITION, ANIMATION_MIDDLE_POSITION, ANIMATION_START_POSITION);
@@ -254,10 +251,6 @@ function animateCardSide(card, startPos, finishPos, finishTransformPos) {
         card.style.transform = 'rotateY(' + finishTransformPos + ')';
     });
 }
-// =====================================
-// Не работает в Mozilla Firefox. Убрать эту порнографию в css
-// =====================================
-
 
 // Game logic module
 function compareOpenCards(openCard) {
