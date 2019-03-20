@@ -24,6 +24,10 @@ body {
     box-shadow: inset 2px 1px 8px rgba(0, 0, 0, 0.5);
 }
 
+.button:hover {
+    cursor: pointer;
+}
+
 /* Main menu */
 .main_menu {
     display: flex;
@@ -97,6 +101,7 @@ label {
 
 .mode_card:hover {
     opacity: 0.9;
+    cursor: pointer;
 }
 
 input[type=radio] {
@@ -142,6 +147,7 @@ input[type=radio]:checked + label {
 
 .game_field > div:hover {
     opacity: 0.9;
+    cursor:pointer;
 }
 
 .card_closed {
