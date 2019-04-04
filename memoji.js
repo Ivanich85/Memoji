@@ -33,7 +33,7 @@ var ANIMATION_START_POSITION = '0';
 var ANIMATION_MIDDLE_POSITION = '180deg';
 var ANIMATION_FINISH_POSITION = '360deg';
 
-//  All emojies array
+//  All emojies array 
 var EMOJI_ARRAY = [
     '🐶', '🐱', '🐭', '🐹', '🐰', '🐻', '🐟', '🐊', '🐸', '🐙', '🐵',
     '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐓', '🦃', '🦄', '🐞', '🦀'
